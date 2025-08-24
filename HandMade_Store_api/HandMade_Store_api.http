@@ -1,0 +1,6 @@
+@HandMade_Store_api_HostAddress = http://localhost:5168
+
+GET {{HandMade_Store_api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
