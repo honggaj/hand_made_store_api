@@ -1,8 +1,9 @@
-﻿using System.Net;
+﻿using HandMade_Store_api.Interfaces;
+using HandMade_Store_api.Interfaces;
+using Microsoft.Extensions.Configuration;
+using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
-using FurnitureStoreAPI.Interfaces;
-using Microsoft.Extensions.Configuration;
 
 namespace FurnitureStoreAPI.Services
 {

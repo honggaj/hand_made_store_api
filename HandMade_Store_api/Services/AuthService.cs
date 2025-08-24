@@ -1,22 +1,22 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using FurnitureStoreAPI.DTOs.Auth;
-using FurnitureStoreAPI.Interfaces;
-using FurnitureStoreAPI.Models;
-using Google.Apis.Auth;
+﻿using Google.Apis.Auth;
+using HandMade_Store_api.DTOs.Auth;
+using HandMade_Store_api.Interfaces;
+using HandMade_Store_api.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
-namespace FurnitureStoreAPI.Services
+namespace HandMade_Store_api.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly FurnitureStoreContext _context;
+        private readonly HandmadeStoreContext _context;
         private readonly IConfiguration _config;
         private readonly IEmailService _emailService;
 
-        public AuthService(FurnitureStoreContext context, IConfiguration config, IEmailService emailService)
+        public AuthService(HandmadeStoreContext context, IConfiguration config, IEmailService emailService)
         {
             _context = context;
             _config = config;

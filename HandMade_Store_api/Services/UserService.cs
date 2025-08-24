@@ -1,15 +1,17 @@
-﻿using FurnitureStoreAPI.DTOs.User;
-using FurnitureStoreAPI.Interfaces;
-using FurnitureStoreAPI.Models;
+﻿using HandMade_Store_api.DTOs.User;
+using HandMade_Store_api.Interfaces;
+using HandMade_Store_api.Models;
+using HandMade_Store_api.Interfaces;
+using HandMade_Store_api.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace FurnitureStoreAPI.Services
+namespace HandMade_Store_api.Services
 {
     public class UserService : IUserService
     {
-        private readonly FurnitureStoreContext _context;
+        private readonly HandmadeStoreContext _context;
 
-        public UserService(FurnitureStoreContext context)
+        public UserService(HandmadeStoreContext context)
         {
             _context = context;
         }
