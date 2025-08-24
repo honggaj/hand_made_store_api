@@ -16,14 +16,14 @@ namespace HandMade_Store_api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<ActionResult<IEnumerable<ProductResponse>>> GetAll()
         {
             var products = await _service.GetAllAsync();
             return Ok(products);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<ActionResult<ProductResponse>> GetById(int id)
         {
             var product = await _service.GetByIdAsync(id);
             if (product == null) return NotFound();
@@ -31,14 +31,14 @@ namespace HandMade_Store_api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] ProductCreateRequest request)
+        public async Task<ActionResult<ProductResponse>> Create([FromForm] ProductCreateRequest request)
         {
             var product = await _service.CreateAsync(request);
             return CreatedAtAction(nameof(GetById), new { id = product.ProductId }, product);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromForm] ProductUpdateRequest request)
+        public async Task<ActionResult<ProductResponse>> Update(int id, [FromForm] ProductUpdateRequest request)
         {
             var product = await _service.UpdateAsync(id, request);
             if (product == null) return NotFound();
@@ -52,5 +52,28 @@ namespace HandMade_Store_api.Controllers
             if (!result) return NotFound();
             return NoContent();
         }
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<ProductResponse>>> Search([FromQuery] string name)
+        {
+            var products = await _service.SearchByNameAsync(name);
+            return Ok(products);
+        }
+        [HttpPatch("{id}/toggle-featured")]
+        public async Task<ActionResult<ProductResponse>> ToggleFeatured(int id)
+        {
+            var product = await _service.ToggleFeaturedAsync(id);
+            if (product == null) return NotFound();
+            return Ok(product);
+        }
+
+        [HttpPatch("{id}/toggle-active")]
+        public async Task<ActionResult<ProductResponse>> ToggleActive(int id)
+        {
+            var product = await _service.ToggleActiveAsync(id);
+            if (product == null) return NotFound();
+            return Ok(product);
+        }
+
+
     }
 }

@@ -19,12 +19,12 @@ namespace HandMade_Store_api.Controllers
         }
 
         // GET: api/user
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserResponse>>> GetAll()
-        {
-            var users = await _userService.GetAllUsersAsync();
-            return Ok(users);
-        }
+            [HttpGet]
+            public async Task<ActionResult<IEnumerable<UserResponse>>> GetAll()
+            {
+                var users = await _userService.GetAllUsersAsync();
+                return Ok(users);
+            }
 
         // GET: api/user/{id}
         [HttpGet("{id}")]

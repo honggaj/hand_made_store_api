@@ -144,10 +144,11 @@ namespace HandMade_Store_api.Services
         {
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.Role)
-            };
+        new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString()),              // vẫn giữ "sub" cho standard
+        new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),               // thêm nameid để dễ đọc
+        new Claim(JwtRegisteredClaimNames.Email, user.Email),
+        new Claim(ClaimTypes.Role, user.Role)
+    };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -162,5 +163,6 @@ namespace HandMade_Store_api.Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
     }
 }

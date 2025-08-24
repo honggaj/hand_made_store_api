@@ -1,6 +1,7 @@
-﻿namespace HandMade_Store_api.DTOs.Product
+﻿using HandMade_Store_api.DTOs.Color;
+
+namespace HandMade_Store_api.DTOs.Product
 {
-    // Response
     public class ProductResponse
     {
         public int ProductId { get; set; }
@@ -12,6 +13,12 @@
         public bool IsFeatured { get; set; }
 
         public List<string> Images { get; set; } = new();
-        public List<string> Colors { get; set; } = new();
+
+        // Category
+        public int CategoryId { get; set; }
+        public string CategoryName { get; set; } = "";
+
+        // Colors - dùng DTO có id + name
+        public List<ColorResponse> Colors { get; set; } = new();
     }
 }

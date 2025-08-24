@@ -1,4 +1,5 @@
 ﻿using HandMade_Store_api.DTOs.Product;
+using HandMade_Store_api.DTOs.Color;
 using HandMade_Store_api.Models;
 using HandMade_Store_api.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -42,12 +43,12 @@ namespace HandMade_Store_api.Services
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
 
-            // Upload ảnh
             if (request.NewImages != null)
             {
                 foreach (var file in request.NewImages)
                 {
-                    var fileName = $"{Guid.NewGuid()}_{file.FileName}";
+                    var extension = Path.GetExtension(file.FileName);
+                    var fileName = $"{Guid.NewGuid()}{extension}";
                     var filePath = Path.Combine(_env.WebRootPath, "upload", fileName);
 
                     using (var stream = new FileStream(filePath, FileMode.Create))
@@ -94,9 +95,7 @@ namespace HandMade_Store_api.Services
                 foreach (var img in imgs)
                 {
                     var filePath = Path.Combine(_env.WebRootPath, img.Url.TrimStart('/'));
-                    if (File.Exists(filePath))
-                        File.Delete(filePath);
-
+                    if (File.Exists(filePath)) File.Delete(filePath);
                     _context.ProductImages.Remove(img);
                 }
             }
@@ -106,7 +105,8 @@ namespace HandMade_Store_api.Services
             {
                 foreach (var file in request.NewImages)
                 {
-                    var fileName = $"{Guid.NewGuid()}_{file.FileName}";
+                    var extension = Path.GetExtension(file.FileName);
+                    var fileName = $"{Guid.NewGuid()}{extension}";
                     var filePath = Path.Combine(_env.WebRootPath, "upload", fileName);
 
                     using (var stream = new FileStream(filePath, FileMode.Create))
@@ -148,12 +148,10 @@ namespace HandMade_Store_api.Services
 
             if (product == null) return false;
 
-            // Xoá ảnh trong wwwroot
             foreach (var img in product.ProductImages)
             {
                 var filePath = Path.Combine(_env.WebRootPath, img.Url.TrimStart('/'));
-                if (File.Exists(filePath))
-                    File.Delete(filePath);
+                if (File.Exists(filePath)) File.Delete(filePath);
             }
 
             _context.Products.Remove(product);
@@ -167,6 +165,7 @@ namespace HandMade_Store_api.Services
             var p = await _context.Products
                 .Include(p => p.ProductImages)
                 .Include(p => p.Colors)
+                .Include(p => p.Category)
                 .FirstOrDefaultAsync(p => p.ProductId == id);
 
             if (p == null) return null;
@@ -181,7 +180,13 @@ namespace HandMade_Store_api.Services
                 IsActive = p.IsActive ?? false,
                 IsFeatured = p.IsFeatured ?? false,
                 Images = p.ProductImages.Select(i => i.Url).ToList(),
-                Colors = p.Colors.Select(c => c.Name).ToList()
+                CategoryId = p.CategoryId,
+                CategoryName = p.Category?.Name ?? "",
+                Colors = p.Colors.Select(c => new ColorResponse
+                {
+                    ColorId = c.ColorId,
+                    Name = c.Name
+                }).ToList()
             };
         }
 
@@ -190,6 +195,7 @@ namespace HandMade_Store_api.Services
             return await _context.Products
                 .Include(p => p.ProductImages)
                 .Include(p => p.Colors)
+                .Include(p => p.Category)
                 .Select(p => new ProductResponse
                 {
                     ProductId = p.ProductId,
@@ -200,9 +206,75 @@ namespace HandMade_Store_api.Services
                     IsActive = p.IsActive ?? false,
                     IsFeatured = p.IsFeatured ?? false,
                     Images = p.ProductImages.Select(i => i.Url).ToList(),
-                    Colors = p.Colors.Select(c => c.Name).ToList()
+                    CategoryId = p.CategoryId,
+                    CategoryName = p.Category != null ? p.Category.Name : "",
+                    Colors = p.Colors.Select(c => new ColorResponse
+                    {
+                        ColorId = c.ColorId,
+                        Name = c.Name
+                    }).ToList()
                 })
                 .ToListAsync();
+        }
+
+        public async Task<IEnumerable<ProductResponse>> SearchByNameAsync(string name)
+        {
+            return await _context.Products
+                .Include(p => p.ProductImages)
+                .Include(p => p.Colors)
+                .Include(p => p.Category)
+                .Where(p => string.IsNullOrEmpty(name) || p.Name.Contains(name))
+                .Select(p => new ProductResponse
+                {
+                    ProductId = p.ProductId,
+                    Name = p.Name,
+                    Description = p.Description,
+                    Price = p.Price,
+                    StockQuantity = p.StockQuantity ?? 0,
+                    IsActive = p.IsActive ?? false,
+                    IsFeatured = p.IsFeatured ?? false,
+                    Images = p.ProductImages.Select(i => i.Url).ToList(),
+                    CategoryId = p.CategoryId,
+                    CategoryName = p.Category != null ? p.Category.Name : "",
+                    Colors = p.Colors.Select(c => new ColorResponse
+                    {
+                        ColorId = c.ColorId,
+                        Name = c.Name
+                    }).ToList()
+                })
+                .ToListAsync();
+        }
+
+        public async Task<ProductResponse?> ToggleFeaturedAsync(int id)
+        {
+            var product = await _context.Products
+                .Include(p => p.Colors)
+                .Include(p => p.ProductImages)
+                .Include(p => p.Category)
+                .FirstOrDefaultAsync(p => p.ProductId == id);
+
+            if (product == null) return null;
+
+            product.IsFeatured = !(product.IsFeatured ?? false);
+            await _context.SaveChangesAsync();
+
+            return await GetByIdAsync(product.ProductId);
+        }
+
+        public async Task<ProductResponse?> ToggleActiveAsync(int id)
+        {
+            var product = await _context.Products
+                .Include(p => p.Colors)
+                .Include(p => p.ProductImages)
+                .Include(p => p.Category)
+                .FirstOrDefaultAsync(p => p.ProductId == id);
+
+            if (product == null) return null;
+
+            product.IsActive = !(product.IsActive ?? false);
+            await _context.SaveChangesAsync();
+
+            return await GetByIdAsync(product.ProductId);
         }
     }
 }
