@@ -30,6 +30,12 @@ builder.Services.AddDbContext<HandmadeStoreContext>(options =>
 // Add Services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+
+builder.Services.AddScoped<IColorService, ColorService>();
+
 
 
 
